@@ -66,7 +66,8 @@ class Vertex{
 class AdjacencyList{
     /**
      *Creates an instance of AdjacencyList.
-     * @param {string} _graph_string A string of the form <vertex number\t[connected_vertex1]\t[connected_vertex2...]\n...
+     * @param {string} _graph_string A string of the form:
+     *  <vertex number\t[connected_vertex1]\t[connected_vertex2...]\n...
      * @memberof AdjacencyList
      */
     constructor(_graph_string){
@@ -160,7 +161,7 @@ class AdjacencyList{
      * @returns {string}
      * @memberof AdjacencyList
      */
-    random_vertex() {
+    random_edge() {
         var vertex_numbers = Object.keys(this.vertexes)
         return vertex_numbers[ vertex_numbers.length * Math.random() << 0];
     };

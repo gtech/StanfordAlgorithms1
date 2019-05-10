@@ -35,16 +35,41 @@ describe('#AdjacencyList', function(){
         expect(vertexes).to.equal(200);
     });
 
-    let list2 = new AdjacencyList(small_graph_string.split('\r\n'));
+    let small_graph = new AdjacencyList(small_graph_string.split('\r\n'));
 
     it('should correctly initialize the degree of our vertexes', function(){
-        expect(list2.vertex_degrees).to.eql([,3,4,4,4,5,3,1]);
+        expect(small_graph.vertex_degrees).to.eql([,3,4,4,4,5,3,1]);
     })
 
     it('should have at least the minimum number of edges in a connected graph', function(){
         let edges = list.count_edges();
         let vertexes = list.count_vertexes();
         expect(edges).to.be.greaterThan(vertexes-2);
+    });
+
+    describe('#random_edge', function(){
+        it('should return an edge uniformly at random',function(){
+            for(let i = 0; i < 100000; i++){
+                let five = 0, seven = 0, four = 0;
+                switch(small_graph.random_edge()){
+                    case 5:
+                    five++;
+                    case 7:
+                    seven++
+                    case 4:
+                    four++;
+                }
+                //10% error bound
+                let error = 0.05;
+                /* Okay we need 5 to show up at about 5/24, 2: 4/24, 7: 1/24 */
+                expect(five).to.be.greaterThan(100000*5/24*(1+error));
+                expect(five).to.be.lessThan(100000*5/24*(1-error));
+                expect(seven).to.be.greaterThan(100000*1/24*(1+error))
+                expect(seven).to.be.lessThan(100000*1/24*(1-error));
+                expect(four).to.be.greaterThan(100000*4/24*(1+error))
+                expect(four).to.be.lessThan(100000*4/24*(1-error))
+            }
+        })
     });
 
     describe('#collapseVertex', function(){
