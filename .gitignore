@@ -1,0 +1,8 @@
+node_modules/
+.idea
+.vscode
+IntegerArray - Copy.txt
+stacks.out
+stacks.svg
+.idea/dictionaries/gtech.xml
+package-lock.json
