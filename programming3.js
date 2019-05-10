@@ -73,6 +73,7 @@ class AdjacencyList{
     constructor(_graph_string){
         this.vertexes = {};
         this.vertex_degrees = [];
+        this.edge_counter = 0;
 
         //Remove blanks. TODO when less tired how do you avoid this dup line?
         let blank = _graph_string.findIndex(x => x == '');
@@ -85,6 +86,7 @@ class AdjacencyList{
             let vertex_number = vertex_row.splice(0,1);
             this.vertexes[vertex_number] = new Vertex(vertex_row);
             this.vertex_degrees[vertex_number] = vertex_row.length;
+            this.edge_counter += vertex_row.length;
         }
         this.stored_vertexes = clone(this.vertexes);
     }
@@ -162,8 +164,16 @@ class AdjacencyList{
      * @memberof AdjacencyList
      */
     random_edge() {
-        var vertex_numbers = Object.keys(this.vertexes)
-        return vertex_numbers[ vertex_numbers.length * Math.random() << 0];
+        let cumulativeProbability = 0;
+        //TODO should this really be zero indexed?
+        let randomEdgeIndex = (this.edge_counter * Math.random() << 0);
+        for(let degree_i = 1; degree_i < this.vertex_degrees.length ; degree_i++) {
+            const currentProbability = cumulativeProbability + this.vertex_degrees[degree_i];
+            if(currentProbability >= randomEdgeIndex){//TODO this might be >
+                return this.vertexes[degree_i].edges[randomEdgeIndex-cumulativeProbability];
+            }
+            cumulativeProbability = currentProbability;
+        }
     };
 
     /**

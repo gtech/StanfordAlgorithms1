@@ -49,26 +49,29 @@ describe('#AdjacencyList', function(){
 
     describe('#random_edge', function(){
         it('should return an edge uniformly at random',function(){
+            let five = 0, seven = 0, four = 0;
             for(let i = 0; i < 100000; i++){
-                let five = 0, seven = 0, four = 0;
                 switch(small_graph.random_edge()){
-                    case 5:
-                    five++;
-                    case 7:
-                    seven++
-                    case 4:
-                    four++;
+                    case "5":
+                        five++;
+                        break;
+                    case "7":
+                        seven++
+                        break;
+                    case "4":
+                        four++;
+                        break;
                 }
-                //10% error bound
-                let error = 0.05;
-                /* Okay we need 5 to show up at about 5/24, 2: 4/24, 7: 1/24 */
-                expect(five).to.be.greaterThan(100000*5/24*(1+error));
-                expect(five).to.be.lessThan(100000*5/24*(1-error));
-                expect(seven).to.be.greaterThan(100000*1/24*(1+error))
-                expect(seven).to.be.lessThan(100000*1/24*(1-error));
-                expect(four).to.be.greaterThan(100000*4/24*(1+error))
-                expect(four).to.be.lessThan(100000*4/24*(1-error))
             }
+            //10% error bound
+            let error = 0.05;
+            /* Okay we need 5 to show up at about 5/24, 2: 4/24, 7: 1/24 */
+            expect(five).to.be.greaterThan(100000*5/24*(1+error));
+            expect(five).to.be.lessThan(100000*5/24*(1-error));
+            expect(seven).to.be.greaterThan(100000*1/24*(1+error));
+            expect(seven).to.be.lessThan(100000*1/24*(1-error));
+            expect(four).to.be.greaterThan(100000*4/24*(1+error));
+            expect(four).to.be.lessThan(100000*4/24*(1-error));
         })
     });
 
