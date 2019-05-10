@@ -69,6 +69,8 @@ describe('#AdjacencyList', function(){
             expect(seven).to.be.greaterThan(100000*1/24*(1-error));
             expect(seven).to.be.lessThan(100000*1/24*(1+error));
 
+            /* TODO for some reason ths is returning at half the rate
+            it should. */
             expect(five).to.be.greaterThan(100000*5/24*(1-error));
             expect(five).to.be.lessThan(100000*5/24*(1+error));
             

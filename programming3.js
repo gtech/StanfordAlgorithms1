@@ -159,17 +159,18 @@ class AdjacencyList{
 
     /**
      *Returns a random vertex from the graph.
-     *
+     *In order to select an edge uniformly at random over a adjacency list, we need
+     to take into account the degree of all the vertexes when accessing the edge by
+     vertex index. So we maintain a count of the degrees of vertexes as we select and remove edges.
      * @returns {string}
      * @memberof AdjacencyList
      */
     random_edge() {
         let cumulativeProbability = 0;
-        //TODO should this really be zero indexed?
         let randomEdgeIndex = (this.edge_counter * Math.random() << 0);
         for(let degree_i = 1; degree_i < this.vertex_degrees.length ; degree_i++) {
             const currentProbability = cumulativeProbability + this.vertex_degrees[degree_i];
-            if(currentProbability >= randomEdgeIndex){//TODO this might be >
+            if(currentProbability >= randomEdgeIndex){
                 return this.vertexes[degree_i].edges[randomEdgeIndex-cumulativeProbability];
             }
             cumulativeProbability = currentProbability;
