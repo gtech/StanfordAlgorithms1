@@ -71,6 +71,7 @@ class AdjacencyList{
      */
     constructor(_graph_string){
         this.vertexes = {};
+        this.vertex_degrees = [];
 
         for (var vertex_row of _graph_string){
             vertex_row = vertex_row.split("\t");
@@ -78,6 +79,7 @@ class AdjacencyList{
             let vertex_number = vertex_row.splice(0,1);
             if(vertex_row.includes('')) vertex_row.pop();
             this.vertexes[vertex_number] = new Vertex(vertex_row);
+            this.vertex_degrees[vertex_number] = vertex_row.length;
         }
         this.stored_vertexes = clone(this.vertexes);
     }
@@ -102,8 +104,12 @@ class AdjacencyList{
         let old_vertex = this.vertexes[old_vertex_number];
         let new_vertex = this.vertexes[new_vertex_number];
 
+        //add the old edges to the new super-node, and remove the self loops.
         new_vertex.edges = new_vertex.edges.concat(old_vertex.edges);
-        new_vertex.edges.filter 
+        new_vertex.edges.filter(vertex => 
+            (vertex != old_vertex_number && vertex != new_vertex_number)
+            );
+        
         for( let vertex_number of old_vertex.edges){
             
             //remove self loops
@@ -161,6 +167,7 @@ class AdjacencyList{
      * @memberof AdjacencyList
      */
     collapse_two_vertexes(){
+        //TODO this should collapse an edge not a vertex, this will not be random over edges.
         let old_vertex = null;
         let new_vertex = null;
 

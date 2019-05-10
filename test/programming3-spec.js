@@ -21,10 +21,11 @@ describe('#Vertex', function(){
     })
 })
 
-const contents = fs.readFileSync('kargerMinCut.txt', 'utf8').split('\r\n');
+const kargerMinCutGraphString = fs.readFileSync('kargerMinCut.txt', 'utf8').split('\r\n');
+const small_graph_string = "1\t2\t5\t4\r\n2\t5\t6\t1\t4\r\n3\t6\t5\t4\t7\r\n4\t1\t2\t3\t5\r\n5\t4\t3\t1\t2\t6\r\n6\t5\t2\t3\r\n7\t3\r\n";
 
 describe('#AdjacencyList', function(){
-    let list = new AdjacencyList(contents);
+    let list = new AdjacencyList(kargerMinCutGraphString);
     it('should exist', function(){
         expect(list).to.not.be.undefined;
     });
@@ -33,6 +34,12 @@ describe('#AdjacencyList', function(){
         let vertexes = list.count_vertexes();
         expect(vertexes).to.equal(200);
     });
+
+    let list2 = new AdjacencyList()
+
+    it('should correctly initialize the degree of our vertexes', function(){
+        
+    })
 
     it('should have at least the minimum number of edges in a connected graph', function(){
         let edges = list.count_edges();
@@ -48,14 +55,13 @@ describe('#AdjacencyList', function(){
 });
 
 describe('#Mincutter', function(){
-    let minc = new MinCutter(contents);
+    let minc = new MinCutter(kargerMinCutGraphString);
     it('should return the number of vertexes before cutting',function(){
         expect(minc.size_of_input()).to.equal(200);
     })
 
     it('should find the min cut on a smaller file', function(){
-        let test_string = "1\t2\t5\t4\r\n2\t5\t6\t1\t4\r\n3\t6\t5\t4\t7\r\n4\t1\t2\t3\t5\r\n5\t4\t3\t1\t2\t6\r\n6\t5\t2\t3\r\n7\t3\r\n";
-        let small_minc = new MinCutter(test_string.split('\r\n'));
+        let small_minc = new MinCutter(small_graph_string.split('\r\n'));
         expect(small_minc.find_mincut()).to.equal(2);
     })
 })
