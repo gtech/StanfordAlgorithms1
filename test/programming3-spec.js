@@ -3,7 +3,7 @@ const fs = require('fs');
 
 
 
-const programming3 = require('./programming3.js');
+const programming3 = require('../programming3.js');
 const AdjacencyList = programming3.AdjacencyList;
 const Vertex = programming3.Vertex;
 const MinCutter = programming3.MinCutter;
@@ -16,7 +16,7 @@ describe('programming3.js', function(){
 
 describe('#Vertex', function(){
     it('should exist', function(){
-        let vertex = programming3.Vertex;
+        let vertex = Vertex;
         expect(vertex).to.not.be.undefined;
     })
 })
@@ -32,19 +32,24 @@ describe('#AdjacencyList', function(){
     it('should have the right number of vertexes',function(){
         let vertexes = list.count_vertexes();
         expect(vertexes).to.equal(200);
-    })
+    });
 
     it('should have at least the minimum number of edges in a connected graph', function(){
         let edges = list.count_edges();
         let vertexes = list.count_vertexes();
         expect(edges).to.be.greaterThan(vertexes-2);
-    })
-})
+    });
+
+    describe('#collapseVertex', function(){
+        it('should delete self loops', function(){
+
+        });
+    });
+});
 
 describe('#Mincutter', function(){
     let minc = new MinCutter(contents);
     it('should return the number of vertexes before cutting',function(){
-        expect(minc.has_cut).to.equal(false);
         expect(minc.size_of_input()).to.equal(200);
     })
 

@@ -71,7 +71,6 @@ class AdjacencyList{
      */
     constructor(_graph_string){
         this.vertexes = {};
-        //_graph_string.pop()
 
         for (var vertex_row of _graph_string){
             vertex_row = vertex_row.split("\t");
@@ -96,19 +95,19 @@ class AdjacencyList{
      *Deletes the edge and vertex from the graph, and collapses it into the new super vertex.
      *
      * @param {string} old_vertex_number vertex to delete
-     * @param {string} new_vertex_number new supervertex
+     * @param {string} new_vertex_number new super-vertex
      * @memberof AdjacencyList
      */
     collapse_vertex(old_vertex_number,new_vertex_number){
         let old_vertex = this.vertexes[old_vertex_number];
         let new_vertex = this.vertexes[new_vertex_number];
 
-        new_vertex.edges.concat
+        new_vertex.edges = new_vertex.edges.concat(old_vertex.edges);
+        new_vertex.edges.filter 
         for( let vertex_number of old_vertex.edges){
             
             //remove self loops
             if(vertex_number == new_vertex_number){
-                
                 new_vertex.remove_edge(old_vertex_number);
                 continue;
             }
@@ -183,7 +182,7 @@ class AdjacencyList{
     count_edges(){
         let count = 0;
         for(let number of Object.keys(this.vertexes)){
-            count += this.vertexes[number].length;
+            count += this.vertexes[number].edges.length;
         }
         return count;
     }
@@ -233,6 +232,7 @@ class MinCutter{
         for(let i = 0; i < attempts; i++){
             new_cut = this.try_mincut();
             if(new_cut < best_cut) best_cut = new_cut;
+            //Reset graph to initial state so we can run Karger's again.
             this.adj_list.restore();
         }
         return best_cut;
@@ -240,7 +240,7 @@ class MinCutter{
 }
 
 module.exports = {
-    Vertex, Edge, AdjacencyList, MinCutter
+    Vertex, AdjacencyList, MinCutter
 }
 
 /* 
@@ -249,6 +249,6 @@ let test_string = "1\t2\t5\t4\r\n2\t7\t5\t6\t1\t4\r\n3\t6\t5\t4\t7\r\n4\t1\t2\t3
 let small_minc = new MinCutter(test_string.split('\r\n'));
 console.log(small_minc.find_mincut()); */
 
-const contents = fs.readFileSync('kargerMinCut.txt', 'utf8').split('\r\n');
+/* const contents = fs.readFileSync('kargerMinCut.txt', 'utf8').split('\r\n');
 let minc = new MinCutter(contents)
-console.log(minc.find_mincut(2));
+console.log(minc.find_mincut(2)); */
