@@ -73,11 +73,15 @@ class AdjacencyList{
         this.vertexes = {};
         this.vertex_degrees = [];
 
+        //Remove blanks. TODO when less tired how do you avoid this dup line?
+        let blank = _graph_string.findIndex(x => x == '');
+        while(blank != -1){
+            _graph_string.splice(blank,1)
+            blank = _graph_string.findIndex(x => x == '');
+        }
         for (var vertex_row of _graph_string){
-            vertex_row = vertex_row.split("\t");
-            if(vertex_row == '') continue;    
+            vertex_row = vertex_row.split("\t"); 
             let vertex_number = vertex_row.splice(0,1);
-            if(vertex_row.includes('')) vertex_row.pop();
             this.vertexes[vertex_number] = new Vertex(vertex_row);
             this.vertex_degrees[vertex_number] = vertex_row.length;
         }

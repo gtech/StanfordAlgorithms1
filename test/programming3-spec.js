@@ -35,10 +35,10 @@ describe('#AdjacencyList', function(){
         expect(vertexes).to.equal(200);
     });
 
-    let list2 = new AdjacencyList()
+    let list2 = new AdjacencyList(small_graph_string.split('\r\n'));
 
     it('should correctly initialize the degree of our vertexes', function(){
-        
+        expect(list2.vertex_degrees).to.eql([,3,4,4,4,5,3,1]);
     })
 
     it('should have at least the minimum number of edges in a connected graph', function(){
