@@ -1,11 +1,27 @@
 const fs = require('fs');
 const clone = require('clone');
 
+/**
+ *
+ *
+ * @class Vertex
+ */
 class Vertex{
+    /**
+     *Creates an instance of Vertex.
+     * @param {Array} _edges The elements are numbers of the connected vertexes.
+     * @memberof Vertex
+     */
     constructor(_edges){
         this.edges = _edges;
     }
 
+    /**
+     *Removes all vertex numbers from the edges array that match vertex_number
+     *
+     * @param {string} vertex_number The vertex number to remove.
+     * @memberof Vertex
+     */
     remove_edge(vertex_number){
         let index = this.edges.indexOf(vertex_number);
         while (index != -1){
@@ -14,35 +30,45 @@ class Vertex{
         }   
     }
 
+    /**
+     *Adds the vertex number to the edges.
+     *
+     * @param {string} vertex_number
+     * @memberof Vertex
+     */
     add_edge(vertex_number){
         this.edges.push(vertex_number);
     }
 
+    /**
+     *Prints whether there are one or more edges to the given vertex represented by the number.
+     *
+     * @param {string} vertex_number
+     * @returns Whether this vertex is connected to the described vertex.
+     * @memberof Vertex
+     */
     is_connected(vertex_number){
         return this.edges.includes(vertex_number);
     }
 
+    /**
+     *Returns the number of edges
+     *
+     * @returns {number} number of edges
+     * @memberof Vertex
+     */
     count_edges(){
         return this.edges.length;
     }
 }
 
-class Edge{
-    constructor(_u,_v){
-        this.v = _v;
-        this.u = _u;
-    }
-
-    update_vertex(old_vertex,new_vertex){
-        if(this.u == old_vertex){
-            this.u = new_vertex;
-        } else {
-            this.v = new_vertex;
-        }
-    }
-}
 
 class AdjacencyList{
+    /**
+     *Creates an instance of AdjacencyList.
+     * @param {string} _graph_string A string of the form <vertex number\t[connected_vertex1]\t[connected_vertex2...]\n...
+     * @memberof AdjacencyList
+     */
     constructor(_graph_string){
         this.vertexes = {};
         //_graph_string.pop()
@@ -57,14 +83,29 @@ class AdjacencyList{
         this.stored_vertexes = clone(this.vertexes);
     }
 
+    /**
+     *Restores the graph to its initial state at construction.
+     *
+     * @memberof AdjacencyList
+     */
     restore(){
         this.vertexes = clone(this.stored_vertexes);
     }
 
+    /**
+     *Deletes the edge and vertex from the graph, and collapses it into the new super vertex.
+     *
+     * @param {string} old_vertex_number vertex to delete
+     * @param {string} new_vertex_number new supervertex
+     * @memberof AdjacencyList
+     */
     collapse_vertex(old_vertex_number,new_vertex_number){
         let old_vertex = this.vertexes[old_vertex_number];
         let new_vertex = this.vertexes[new_vertex_number];
+
+        new_vertex.edges.concat
         for( let vertex_number of old_vertex.edges){
+            
             //remove self loops
             if(vertex_number == new_vertex_number){
                 
@@ -75,8 +116,9 @@ class AdjacencyList{
             TODO We have to add all duplicate edges as well, just like we're removing them.
             So if we have 3 duplicate edges on our old_vertex to our vertex_number,
             we need to add all of those to the vertex_number and to new_vertex. 
-            Wait is that already done because we're iterating through them? Maybe. God why is this
-            code so complex? */
+            Wait is that already done because we're iterating through them? 
+            
+            It seems like we can do all of this functionally.*/
 
             try{
                 this.vertexes[vertex_number].add_edge(new_vertex_number);
@@ -87,22 +129,38 @@ class AdjacencyList{
             new_vertex.add_edge(vertex_number);
             this.vertexes[vertex_number].remove_edge(old_vertex_number);    
         }
-        //TODO this is horribly inefficient and probably wrong.
-        //this.remove_from_all_vertexes(old_vertex_number);
         delete this.vertexes[old_vertex_number];
     }
 
+    /**
+     *Remove the edges that point to the given vertex from all vertexes in the graph.
+     This is stupid, don't use this.
+     *
+     * @param {string} vertex_number
+     * @memberof AdjacencyList
+     */
     remove_from_all_vertexes(vertex_number){
         for(let number of Object.keys(this.vertexes)){
             this.vertexes[number].remove_edge(vertex_number);
         }
     }
 
+    /**
+     *Returns a random vertex from the graph.
+     *
+     * @returns {string}
+     * @memberof AdjacencyList
+     */
     random_vertex() {
         var vertex_numbers = Object.keys(this.vertexes)
         return vertex_numbers[ vertex_numbers.length * Math.random() << 0];
     };
 
+    /**
+     *Collapse a random two vertexes into a super-vertex.
+     *
+     * @memberof AdjacencyList
+     */
     collapse_two_vertexes(){
         let old_vertex = null;
         let new_vertex = null;
@@ -115,11 +173,19 @@ class AdjacencyList{
         this.collapse_vertex(old_vertex, new_vertex);
     }
 
+    
+    /**
+     *Return the number of edges in the graph.
+     *
+     * @returns {number} The number of edges in the graph.
+     * @memberof AdjacencyList
+     */
     count_edges(){
         let count = 0;
         for(let number of Object.keys(this.vertexes)){
             count += this.vertexes[number].length;
         }
+        return count;
     }
 
     count_vertexes(){
@@ -132,6 +198,12 @@ class MinCutter{
         this.adj_list = new AdjacencyList(_graph_string);
     };
 
+    /**
+     *Run Karger's algorithm.
+     *
+     * @returns {number} 1/n^2 likely the number of edges in the minimum cut.
+     * @memberof MinCutter
+     */
     try_mincut(){
         while (this.adj_list.count_vertexes() > 2){
            this.adj_list.collapse_two_vertexes()
@@ -143,10 +215,18 @@ class MinCutter{
         return this.adj_list.count_vertexes();
     }
 
+    /**
+     *Run Karger's algorithm a default of 5*n^2 times and 
+     return the probable minimum cut of the graph.
+     *
+     * @param {number} attempts Optional number of times to run the algorithm before returning.
+     * @returns {number} The probable number of edges in the minimum cut.
+     * @memberof MinCutter
+     */
     find_mincut(attempts){
         let n = this.size_of_input();
         if (attempts == undefined){
-           attempts = 10*(n^2);
+           attempts = 5*(n^2);
         }
         let best_cut = 10000000;
         let new_cut = 0;
@@ -163,7 +243,9 @@ module.exports = {
     Vertex, Edge, AdjacencyList, MinCutter
 }
 
-/* let test_string = "1\t2\t5\t4\r\n2\t7\t5\t6\t1\t4\r\n3\t6\t5\t4\t7\r\n4\t1\t2\t3\t5\r\n5\t4\t3\t1\t2\t6\r\n6\t5\t2\t3\r\n7\t3\t2\r\n";
+/* 
+TODO figure how to automate testing in VScode so I don't have to do this to debug.
+let test_string = "1\t2\t5\t4\r\n2\t7\t5\t6\t1\t4\r\n3\t6\t5\t4\t7\r\n4\t1\t2\t3\t5\r\n5\t4\t3\t1\t2\t6\r\n6\t5\t2\t3\r\n7\t3\t2\r\n";
 let small_minc = new MinCutter(test_string.split('\r\n'));
 console.log(small_minc.find_mincut()); */
 
