@@ -50,7 +50,10 @@ describe('#AdjacencyList', function(){
     describe('#random_edge', function(){
         it('should return an edge uniformly at random',function(){
             let five = 0, seven = 0, four = 0;
+            let frequencies = [];
             for(let i = 0; i < 100000; i++){
+                let edge = small_graph.random_edge();
+                frequencies[parseInt(edge[0])]
                 switch(small_graph.random_edge()){
                     case "5":
                         five++;
@@ -70,7 +73,7 @@ describe('#AdjacencyList', function(){
             expect(seven).to.be.lessThan(100000*1/24*(1+error));
 
             /* TODO for some reason ths is returning at half the rate
-            it should. */
+            it should. I should make an array of frequencies and then inspect it. */
             expect(five).to.be.greaterThan(100000*5/24*(1-error));
             expect(five).to.be.lessThan(100000*5/24*(1+error));
             
