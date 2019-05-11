@@ -108,12 +108,14 @@ class AdjacencyList{
      * @memberof AdjacencyList
      */
     collapse_edge(){
-        let edge = this.random_edge();
-        let old_vertex_number = edge[0].toString();
-        let new_vertex_number = edge[2];
+
+        //I like how expresive these vars are, but I'm not sure if others will hate it.
+        const edge = this.random_edge();
+        const old_vertex_number = edge[0].toString();
+        const new_vertex_number = edge[2];
         let old_vertex = this.vertexes[old_vertex_number];
         let new_vertex = this.vertexes[new_vertex_number];
-        let previous_vertex_length = old_vertex.edges.length + new_vertex.edges.length;
+        const previous_vertex_length = old_vertex.edges.length + new_vertex.edges.length;
 
         //add the old edges to the new super-node, and remove the self loops.
         new_vertex.edges = new_vertex.edges.concat(old_vertex.edges);
@@ -122,53 +124,21 @@ class AdjacencyList{
             );
         this.edge_counter -= (previous_vertex_length - new_vertex.edges.length);
         
-        /* TODO now we want to iterate through the connected vertexes and point their edges to the supernode. 
-        This won't change the number of */
+        /* TODO now we want to iterate through the connected vertexes and point their 
+        old edges to the supernode. 
+        This won't change the degree of the verts*/
         for (const vertex of new_vertex.edges) {
             let adj_vertex = this.vertexes[vertex];
-            let prev_length = adj_vertex.edges.length;
             //TODO this shouldn't be a filter but a replace of old_vertex with new_vertex
             adj_vertex.edges = filter(adj_vertex.edges, vertex => vertex != old_vertex_number);
         }
 
-        //Finally we want to update the counters.
-        //TODO we also need to update the degree of the old_vertex and supernode
+        /* Finally we want to update the counters.
+        TODO we also need to update the degree of the old_vertex and supernode 
+        the update will be an update of the supernode's degree, and setting the old vertex's to 0*/
         this.vertex_counter -= 1;
         
-        
-        for( let vertex_number of old_vertex.edges){
-            
-            /* 
-            TODO We have to add all duplicate edges as well, just like we're removing them.
-            So if we have 3 duplicate edges on our old_vertex to our vertex_number,
-            we need to add all of those to the vertex_number and to new_vertex. 
-            Wait is that already done because we're iterating through them? 
-            
-            It seems like we can do all of this functionally.*/
-
-            try{
-                this.vertexes[vertex_number].add_edge(new_vertex_number);
-            } catch(err){
-                var i = 0;
-            }
-            
-            new_vertex.add_edge(vertex_number);
-            this.vertexes[vertex_number].remove_edge(old_vertex_number);    
-        }
         delete this.vertexes[old_vertex_number];
-    }
-
-    /**
-     *Remove the edges that point to the given vertex from all vertexes in the graph.
-     This is stupid, don't use this.
-     *
-     * @param {string} vertex_number
-     * @memberof AdjacencyList
-     */
-    remove_from_all_vertexes(vertex_number){
-        for(let number of Object.keys(this.vertexes)){
-            this.vertexes[number].remove_edge(vertex_number);
-        }
     }
 
     /**
