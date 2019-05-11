@@ -49,36 +49,24 @@ describe('#AdjacencyList', function(){
 
     describe('#random_edge', function(){
         it('should return an edge uniformly at random',function(){
-            let five = 0, seven = 0, four = 0;
-            let frequencies = [];
-            for(let i = 0; i < 100000; i++){
+            let frequencies = new Array(8).fill(0);
+            let trials = 100000;
+            for(let i = 0; i < trials; i++){
                 let edge = small_graph.random_edge();
-                frequencies[parseInt(edge[0])]
-                switch(small_graph.random_edge()){
-                    case "5":
-                        five++;
-                        break;
-                    case "7":
-                        seven++
-                        break;
-                    case "4":
-                        four++;
-                        break;
-                }
+                frequencies[edge[2]] += 1;
             }
-            //10% error bound
+            //10% error bound for randomly choosing edges.
             let error = 0.05;
-            /* Okay we need 5 to show up at about 5/24, 2: 4/24, 7: 1/24 */
-            expect(seven).to.be.greaterThan(100000*1/24*(1-error));
-            expect(seven).to.be.lessThan(100000*1/24*(1+error));
-
-            /* TODO for some reason ths is returning at half the rate
-            it should. I should make an array of frequencies and then inspect it. */
-            expect(five).to.be.greaterThan(100000*5/24*(1-error));
-            expect(five).to.be.lessThan(100000*5/24*(1+error));
             
-            expect(four).to.be.greaterThan(100000*4/24*(1-error));
-            expect(four).to.be.lessThan(100000*4/24*(1+error));
+            /* Okay we need 5 to show up at about 5/24 probability, 2: 4/24, 7: 1/24 */
+            expect(frequencies["7"]).to.be.greaterThan(trials*1/24*(1-error));
+            expect(frequencies["7"]).to.be.lessThan(trials*1/24*(1+error));
+
+            expect(frequencies["5"]).to.be.greaterThan(trials*5/24*(1-error));
+            expect(frequencies["5"]).to.be.lessThan(trials*5/24*(1+error));
+            
+            expect(frequencies["4"]).to.be.greaterThan(trials*4/24*(1-error));
+            expect(frequencies["4"]).to.be.lessThan(trials*4/24*(1+error));
         })
     });
 

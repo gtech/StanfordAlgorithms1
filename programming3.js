@@ -171,10 +171,11 @@ class AdjacencyList{
      vertex index. So we maintain a count of the degrees of vertexes as we select and remove edges. */
         let cumulativeProbability = 0;
         let randomEdgeIndex = (this.edge_counter * Math.random() << 0);
+
         for(let degree_i = 1; degree_i < this.vertex_degrees.length ; degree_i++) {
             const currentProbability = cumulativeProbability + this.vertex_degrees[degree_i];
             if(currentProbability >= randomEdgeIndex){
-                let edge_index = randomEdgeIndex-cumulativeProbability;
+                let edge_index = randomEdgeIndex-cumulativeProbability - 1;
                 return [degree_i, edge_index, this.vertexes[degree_i].edges[edge_index]];
             }
             cumulativeProbability = currentProbability;
