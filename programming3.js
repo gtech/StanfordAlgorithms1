@@ -88,6 +88,7 @@ class AdjacencyList{
             this.vertex_degrees[vertex_number] = vertex_row.length;
             this.edge_counter += vertex_row.length;
         }
+        this.vertex_counter = this.count_vertexes();
         this.stored_vertexes = clone(this.vertexes);
     }
 
@@ -97,33 +98,46 @@ class AdjacencyList{
      * @memberof AdjacencyList
      */
     restore(){
+        //TODO does this need to restore the other meta datastructures?
         this.vertexes = clone(this.stored_vertexes);
     }
 
     /**
      *Deletes the edge and vertex from the graph, and collapses it into the new super vertex.
      *
-     * @param {string} old_vertex_number vertex to delete
-     * @param {string} new_vertex_number new super-vertex
      * @memberof AdjacencyList
      */
-    collapse_vertex(old_vertex_number,new_vertex_number){
+    collapse_edge(){
+        let edge = this.random_edge();
+        let old_vertex_number = edge[0].toString();
+        let new_vertex_number = edge[2];
         let old_vertex = this.vertexes[old_vertex_number];
         let new_vertex = this.vertexes[new_vertex_number];
+        let previous_vertex_length = old_vertex.edges.length + new_vertex.edges.length;
 
         //add the old edges to the new super-node, and remove the self loops.
         new_vertex.edges = new_vertex.edges.concat(old_vertex.edges);
-        new_vertex.edges.filter(vertex => 
+        new_vertex.edges = new_vertex.edges.filter(vertex => 
             (vertex != old_vertex_number && vertex != new_vertex_number)
             );
+        this.edge_counter -= (previous_vertex_length - new_vertex.edges.length);
+        
+        /* TODO now we want to iterate through the connected vertexes and point their edges to the supernode. 
+        This won't change the number of */
+        for (const vertex of new_vertex.edges) {
+            let adj_vertex = this.vertexes[vertex];
+            let prev_length = adj_vertex.edges.length;
+            //TODO this shouldn't be a filter but a replace of old_vertex with new_vertex
+            adj_vertex.edges = filter(adj_vertex.edges, vertex => vertex != old_vertex_number);
+        }
+
+        //Finally we want to update the counters.
+        //TODO we also need to update the degree of the old_vertex and supernode
+        this.vertex_counter -= 1;
+        
         
         for( let vertex_number of old_vertex.edges){
             
-            //remove self loops
-            if(vertex_number == new_vertex_number){
-                new_vertex.remove_edge(old_vertex_number);
-                continue;
-            }
             /* 
             TODO We have to add all duplicate edges as well, just like we're removing them.
             So if we have 3 duplicate edges on our old_vertex to our vertex_number,
@@ -181,25 +195,6 @@ class AdjacencyList{
             cumulativeProbability = currentProbability;
         }
     };
-
-    /**
-     *Collapse a random two vertexes into a super-vertex.
-     *
-     * @memberof AdjacencyList
-     */
-    collapse_two_vertexes(){
-        //TODO this should collapse an edge not a vertex, this will not be random over edges.
-        let old_vertex = null;
-        let new_vertex = null;
-
-        while(old_vertex == new_vertex){
-            old_vertex = this.random_vertex();
-            new_vertex = this.random_vertex();
-        }
-
-        this.collapse_vertex(old_vertex, new_vertex);
-    }
-
     
     /**
      *Return the number of edges in the graph.
@@ -212,11 +207,14 @@ class AdjacencyList{
         for(let number of Object.keys(this.vertexes)){
             count += this.vertexes[number].edges.length;
         }
+        this.edge_counter = count;
         return count;
     }
 
     count_vertexes(){
-        return Object.keys(this.vertexes).length;
+        let count = Object.keys(this.vertexes).length;
+        this.vertex_counter = count;
+        return count;
     }
 }
 
@@ -233,13 +231,13 @@ class MinCutter{
      */
     try_mincut(){
         while (this.adj_list.count_vertexes() > 2){
-           this.adj_list.collapse_two_vertexes()
+           this.adj_list.collapse_edge();
         }
         return this.adj_list.vertexes[this.adj_list.random_vertex()].count_edges();
     }
 
     size_of_input(){
-        return this.adj_list.count_vertexes();
+        return this.adj_list.count_edges();
     }
 
     /**
@@ -270,13 +268,3 @@ class MinCutter{
 module.exports = {
     Vertex, AdjacencyList, MinCutter
 }
-
-/* 
-TODO figure how to automate testing in VScode so I don't have to do this to debug.
-let test_string = "1\t2\t5\t4\r\n2\t7\t5\t6\t1\t4\r\n3\t6\t5\t4\t7\r\n4\t1\t2\t3\t5\r\n5\t4\t3\t1\t2\t6\r\n6\t5\t2\t3\r\n7\t3\t2\r\n";
-let small_minc = new MinCutter(test_string.split('\r\n'));
-console.log(small_minc.find_mincut()); */
-
-/* const contents = fs.readFileSync('kargerMinCut.txt', 'utf8').split('\r\n');
-let minc = new MinCutter(contents)
-console.log(minc.find_mincut(2)); */

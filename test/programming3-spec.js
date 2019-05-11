@@ -57,7 +57,7 @@ describe('#AdjacencyList', function(){
             }
             //10% error bound for randomly choosing edges.
             let error = 0.05;
-            
+
             /* Okay we need 5 to show up at about 5/24 probability, 2: 4/24, 7: 1/24 */
             expect(frequencies["7"]).to.be.greaterThan(trials*1/24*(1-error));
             expect(frequencies["7"]).to.be.lessThan(trials*1/24*(1+error));
@@ -70,9 +70,9 @@ describe('#AdjacencyList', function(){
         })
     });
 
-    describe('#collapseVertex', function(){
+    describe('#collapseVertex()', function(){
         it('should delete self loops', function(){
-
+            expect(false).to.be.true;
         });
     });
 });
