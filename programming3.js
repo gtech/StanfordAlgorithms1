@@ -98,8 +98,10 @@ class AdjacencyList{
      * @memberof AdjacencyList
      */
     restore(){
-        //TODO does this need to restore the other meta datastructures?
+        //TODO Must repopulate this.vertex_degrees[]
         this.vertexes = clone(this.stored_vertexes);
+        this.count_edges();
+        this.count_vertexes();
     }
 
     /**
@@ -109,7 +111,7 @@ class AdjacencyList{
      */
     collapse_edge(){
 
-        //I like how expresive these vars are, but I'm not sure if others will hate it.
+        //TODO I like how expresive these vars are, but I'm not sure if others will hate it.
         const edge = this.random_edge();
         const old_vertex_number = edge[0].toString();
         const new_vertex_number = edge[2];
