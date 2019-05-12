@@ -98,7 +98,7 @@ class AdjacencyList{
      * @memberof AdjacencyList
      */
     restore(){
-        //TODO Must repopulate this.vertex_degrees[]
+        //TODO Must repopulate this.vertex_degrees
         this.vertexes = clone(this.stored_vertexes);
         this.count_edges();
         this.count_vertexes();
@@ -129,10 +129,17 @@ class AdjacencyList{
         /* TODO now we want to iterate through the connected vertexes and point their 
         old edges to the supernode. 
         This won't change the degree of the verts*/
+        let looked_at_vertexes = [];
         for (const vertex of new_vertex.edges) {
             let adj_vertex = this.vertexes[vertex];
+            //Don't do redundant searches of vertexes you have already visited.
+            //This happens when there are multiple edges to the same vertex.
+            if (looked_at_vertexes.includes(vertex)) continue;
+            looked_at_vertexes.push(vertex);
+
             //TODO this shouldn't be a filter but a replace of old_vertex with new_vertex
-            adj_vertex.edges = filter(adj_vertex.edges, vertex => vertex != old_vertex_number);
+            adj_vertex.edges.map(vertex => 
+                { if (vertex == old_vertex_number) return new_vertex_number})
         }
 
         /* Finally we want to update the counters.
