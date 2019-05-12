@@ -137,9 +137,10 @@ class AdjacencyList{
             if (looked_at_vertexes.includes(vertex)) continue;
             looked_at_vertexes.push(vertex);
 
-            //TODO this shouldn't be a filter but a replace of old_vertex with new_vertex
-            adj_vertex.edges.map(vertex => 
-                { if (vertex == old_vertex_number) return new_vertex_number})
+            //This shouldn't be a filter but a replace of old_vertex with new_vertex
+            adj_vertex.edges = adj_vertex.edges.map(vertex => { 
+                if(vertex == old_vertex_number) return new_vertex_number;
+                                                return vertex;});
         }
 
         /* Finally we want to update the counters.
