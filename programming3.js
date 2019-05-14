@@ -235,7 +235,7 @@ class MinCutter{
         while (this.adj_list.count_vertexes() > 2){
            this.adj_list.collapse_edge();
         }
-        return this.adj_list.count_edges();
+        return this.adj_list.count_edges()/2;
     }
 
     size_of_input(){
@@ -253,7 +253,7 @@ class MinCutter{
     find_mincut(attempts){
         let n = this.size_of_input();
         if (attempts == undefined){
-           attempts = 5*n;
+           attempts = n;
         }
         let best_cut = 10000000;
         let new_cut = 0;
@@ -261,18 +261,13 @@ class MinCutter{
             new_cut = this.try_mincut();
             if(new_cut < best_cut){
                 best_cut = new_cut;
-                console.log('found new cut '+ i + ' ' + best_cut.toString());
+                console.log('found new cut '+ i + ' '    + best_cut.toString());
                 fs.writeFileSync('./best_cut.txt', best_cut.toString(),function(err,data){
                     if(err) {
                         return console.log(err);
                     }
                     console.log("The file was saved!");
                 });
-                // var stream = fs.createWriteStream("best_cut.txt");
-                // stream.once('open', function(fd) {
-                //     stream.write(best_cut.toString());
-                //     stream.end();
-                // });
             }
             //Reset graph to initial state so we can run Karger's again.
             this.adj_list.restore();
