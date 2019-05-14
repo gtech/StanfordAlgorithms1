@@ -75,21 +75,27 @@ class AdjacencyList{
         this.vertex_degrees = [];
         this.edge_counter = 0;
 
-        //Remove blanks. TODO when less tired how do you avoid this dup line?
-        let blank = _graph_string.findIndex(x => x == '');
-        while(blank != -1){
-            _graph_string.splice(blank,1)
-            blank = _graph_string.findIndex(x => x == '');
-        }
+        //TODO We're not inputing lines 199 and 200, and 198 is ending before its last number
+        this.remove_blanks(_graph_string);
         for (var vertex_row of _graph_string){
-            vertex_row = vertex_row.split("\t"); 
+            //vertex_row = vertex_row.split("\t");
+            vertex_row = vertex_row.match(/\d+/g).map(Number);
             let vertex_number = vertex_row.splice(0,1);
+            this.remove_blanks(vertex_row);
             this.vertexes[vertex_number] = new Vertex(vertex_row);
             this.vertex_degrees[vertex_number] = vertex_row.length;
             this.edge_counter += vertex_row.length;
         }
         this.vertex_counter = this.count_vertexes();
         this.stored_vertexes = clone(this.vertexes);
+    }
+
+    remove_blanks(target_string){
+        let blank = target_string.findIndex(x => x == '');
+        while(blank != -1){
+            target_string.splice(blank,1);
+            blank = target_string.findIndex(x => x == '');
+        }
     }
 
     /**
@@ -102,6 +108,8 @@ class AdjacencyList{
         this.vertexes = clone(this.stored_vertexes);
         this.count_edges();
         this.count_vertexes();
+        this.restore_degrees();
+        let c = 0;
     }
 
     /**
@@ -110,8 +118,6 @@ class AdjacencyList{
      * @memberof AdjacencyList
      */
     collapse_edge(){
-
-        //TODO I like how expresive these vars are, but I'm not sure if others will hate it.
         const edge = this.random_edge();
         const old_vertex_number = edge[0].toString();
         const new_vertex_number = edge[2];
@@ -126,26 +132,34 @@ class AdjacencyList{
             );
         this.edge_counter -= (previous_vertex_length - new_vertex.edges.length);
         
-        /* TODO now we want to iterate through the connected vertexes and point their 
+        
+        /* Now we want to iterate through the connected vertexes and point their 
         old edges to the supernode. 
         This won't change the degree of the verts*/
         let looked_at_vertexes = [];
         for (const vertex of new_vertex.edges) {
             let adj_vertex = this.vertexes[vertex];
             //Don't do redundant searches of vertexes you have already visited.
-            //This happens when there are multiple edges to the same vertex.
+            //This happens when there are multiple edges between two vertexes.
             if (looked_at_vertexes.includes(vertex)) continue;
             looked_at_vertexes.push(vertex);
 
-            //This shouldn't be a filter but a replace of old_vertex with new_vertex
-            adj_vertex.edges = adj_vertex.edges.map(vertex => { 
-                if(vertex == old_vertex_number) return new_vertex_number;
-                                                return vertex;});
+            //Replace the old vertex with the new vertex in adjacent vertexes.
+            try{
+                adj_vertex.edges = adj_vertex.edges.map(vertex => { 
+                    if(vertex == old_vertex_number) return new_vertex_number;
+                                                    return vertex;});
+            } catch{
+                console.log('uh oh');
+            }
+            
         }
 
         /* Finally we want to update the counters.
-        TODO we also need to update the degree of the old_vertex and supernode 
+        We also need to update the degree of the old_vertex and supernode 
         the update will be an update of the supernode's degree, and setting the old vertex's to 0*/
+        this.vertex_degrees[new_vertex_number] = new_vertex.edges.length;
+        this.vertex_degrees[old_vertex_number] = 0;
         this.vertex_counter -= 1;
         
         delete this.vertexes[old_vertex_number];
@@ -164,13 +178,14 @@ class AdjacencyList{
      to take into account the degree of all the vertexes when accessing the edge by
      vertex index. So we maintain a count of the degrees of vertexes as we select and remove edges. */
         let cumulativeProbability = 0;
-        let randomEdgeIndex = (this.edge_counter * Math.random() << 0);
+        let randomEdgeIndex = ((this.edge_counter-1) * Math.random() << 0);
 
         for(let degree_i = 1; degree_i < this.vertex_degrees.length ; degree_i++) {
             const currentProbability = cumulativeProbability + this.vertex_degrees[degree_i];
-            if(currentProbability >= randomEdgeIndex){
-                let edge_index = randomEdgeIndex-cumulativeProbability - 1;
-                return [degree_i, edge_index, this.vertexes[degree_i].edges[edge_index]];
+            if(currentProbability > randomEdgeIndex){
+                let edge_index = randomEdgeIndex-cumulativeProbability;
+                let edge = [degree_i, edge_index, this.vertexes[degree_i].edges[edge_index]];
+                return edge;
             }
             cumulativeProbability = currentProbability;
         }
@@ -189,6 +204,13 @@ class AdjacencyList{
         }
         this.edge_counter = count;
         return count;
+    }
+
+    restore_degrees(){
+        for(let number of Object.keys(this.vertexes)){
+            this.vertex_degrees[number] = this.vertexes[number].edges.length;
+        }
+        return this.vertex_degrees;
     }
 
     count_vertexes(){
@@ -213,11 +235,11 @@ class MinCutter{
         while (this.adj_list.count_vertexes() > 2){
            this.adj_list.collapse_edge();
         }
-        return this.adj_list.vertexes[this.adj_list.random_vertex()].count_edges();
+        return this.adj_list.count_edges();
     }
 
     size_of_input(){
-        return this.adj_list.count_edges();
+        return this.adj_list.count_vertexes();
     }
 
     /**
@@ -231,13 +253,27 @@ class MinCutter{
     find_mincut(attempts){
         let n = this.size_of_input();
         if (attempts == undefined){
-           attempts = 5*(n^2);
+           attempts = 5*n;
         }
         let best_cut = 10000000;
         let new_cut = 0;
         for(let i = 0; i < attempts; i++){
             new_cut = this.try_mincut();
-            if(new_cut < best_cut) best_cut = new_cut;
+            if(new_cut < best_cut){
+                best_cut = new_cut;
+                console.log('found new cut '+ i + ' ' + best_cut.toString());
+                fs.writeFileSync('./best_cut.txt', best_cut.toString(),function(err,data){
+                    if(err) {
+                        return console.log(err);
+                    }
+                    console.log("The file was saved!");
+                });
+                // var stream = fs.createWriteStream("best_cut.txt");
+                // stream.once('open', function(fd) {
+                //     stream.write(best_cut.toString());
+                //     stream.end();
+                // });
+            }
             //Reset graph to initial state so we can run Karger's again.
             this.adj_list.restore();
         }

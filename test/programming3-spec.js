@@ -55,8 +55,8 @@ describe('#AdjacencyList', function(){
                 let edge = small_graph.random_edge();
                 frequencies[edge[2]] += 1;
             }
-            //10% error bound for randomly choosing edges.
-            let error = 0.05;
+            //14% error bound for randomly choosing edges.
+            let error = 0.07;
 
             /* Okay we need 5 to show up at about 5/24 probability, 2: 4/24, 7: 1/24 */
             expect(frequencies["7"]).to.be.greaterThan(trials*1/24*(1-error));
@@ -80,11 +80,23 @@ describe('#AdjacencyList', function(){
 describe('#Mincutter', function(){
     let minc = new MinCutter(kargerMinCutGraphString);
     it('should return the number of vertexes before cutting',function(){
-        expect(minc.size_of_input()).to.equal(200);
+        expect(minc.size_of_input()).to.equal(5234);
     })
+    const four_node = fs.readFileSync('four_nodes_test.txt', 'utf8').split('\r\n');
+    let minc_four = new MinCutter(four_node);
+    it('should find the right number of cuts in a four node graph', function(){
+        const cut = minc_four.find_mincut();
+        console.log(cut);
+        expect(cut).to.not.be.undefined();
+    })
+
 
     it('should find the min cut on a smaller file', function(){
         let small_minc = new MinCutter(small_graph_string.split('\r\n'));
         expect(small_minc.find_mincut()).to.equal(2);
     })
-})
+
+   it('should find a mincut for the large string', function(){
+        expect(minc.find_mincut()).to.not.be.undefined();
+    });
+});
